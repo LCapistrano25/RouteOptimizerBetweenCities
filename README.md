@@ -1,12 +1,30 @@
 # Graph
-ℹ️ Este código Python implementa um sistema interativo para gerenciar um grafo de cidades e suas rotas, utilizando estruturas de dados como dicionários e classes.
 
-🌐 O programa permite adicionar cidades ao grafo, estabelecer rotas entre elas com distâncias associadas, encontrar o caminho menos custoso entre duas cidades, e listar todas as rotas disponíveis.
+ℹ️ Este projeto é uma implementação em Python de um sistema de gerenciamento de grafos voltado para cidades e rotas. O código utiliza estruturas de dados eficientes como dicionários e classes para representar a conectividade entre localidades.
 
-🛤️ Cada cidade é representada por um nó no grafo, que pode ser conectado a outros nós (cidades) por meio de rotas.
+## 🚀 Funcionalidades
 
-🔍 Inclui funcionalidades de verificação para evitar a adição de cidades com nomes repetitivos, garantindo a integridade dos dados.
+- **Gerenciamento de Cidades**: Adição de nós (cidades) ao grafo com identificação única.
+- **Criação de Rotas**: Estabelecimento de conexões entre cidades com custos (distâncias) associados.
+- **Caminho Mais Curto**: Algoritmo para encontrar a rota menos custosa entre dois pontos.
+- **Listagem de Rotas**: Visualização de todas as rotas possíveis entre cidades selecionadas.
+- **Interface Interativa**: Menu via terminal para fácil interação com o sistema.
 
-🖥️ O usuário interage com o sistema por meio de um menu intuitivo, onde pode selecionar as operações desejadas para explorar e gerenciar as informações sobre as cidades e rotas.
+## 🛠️ Detalhes Técnicos
 
-🚀 Um exemplo prático de aplicação seria a gestão de rotas de transporte ou redes de telecomunicações, onde a eficiência na escolha de caminhos e na gestão de recursos é crucial.
+O código foi desenvolvido com foco em legibilidade e está totalmente em **inglês**, utilizando as seguintes classes principais:
+
+- `Node` ([node.py](node.py)): Representa cada cidade e seus vizinhos.
+- `Graph` ([graph.py](graph.py)): Gerencia a lógica do grafo e algoritmos de busca.
+- `main` ([main.py](main.py)): Ponto de entrada que executa o menu interativo.
+
+## 🔧 Como Executar
+
+Certifique-se de ter o Python instalado e a biblioteca `colorama` (utilizada para cores no terminal).
+
+```bash
+python main.py
+```
+
+---
+*Este projeto demonstra conceitos fundamentais de teoria dos grafos e algoritmos de busca.*
