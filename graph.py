@@ -1,163 +1,121 @@
 from colorama import init, Fore
 
-from node import No
+from node import Node
 
-class Grafo:
+class Graph:
     def __init__(self):
-        self.nos = {}  # Inicializa um dicionário de nós do grafo
-        self.proximo_id = 1  # Inicializa o próximo id disponível para cidades
+        self.nodes = {}
+        self.next_id = 1
 
-    def adicionar_no(self, nome):
-        # Verifica se o nome da cidade já existe no grafo
-        if any(nome == no.conteudo for no in self.nos.values()):
-            print(f"{Fore.RED}Erro: A cidade '{nome}' já existe no grafo.")
+    def add_node(self, name):
+        if any(name == node.content for node in self.nodes.values()):
+            print(f"{Fore.RED}Error: The city '{name}' already exists in the graph.")
             return None
         
-        no = No(nome)
-        self.nos[self.proximo_id] = no  # Adiciona um nó ao dicionário de nós do grafo com o próximo id disponível
-        self.proximo_id += 1  # Atualiza o próximo id disponível
-        return no
+        node = Node(name)
+        self.nodes[self.next_id] = node
+        self.next_id += 1
+        return node
 
-    def adicionar_rota(self, origem_id, destino_id, custo):
-        if origem_id in self.nos and destino_id in self.nos:
-            origem = self.nos[origem_id].conteudo
-            destino = self.nos[destino_id].conteudo
-            self.nos[origem_id].adicionar_vizinho(self.nos[destino_id], custo)
+    def add_route(self, origin_id, destination_id, cost):
+        if origin_id in self.nodes and destination_id in self.nodes:
+            origin = self.nodes[origin_id].content
+            destination = self.nodes[destination_id].content
+            self.nodes[origin_id].add_neighbor(self.nodes[destination_id], cost)
         else:
-            print("Uma das cidades não foi encontrada no grafo.")
+            print("One of the cities was not found in the graph.")
 
-    def _encontrar_caminho_recursivo(self, no_atual, destino, distancias, caminho_anterior, custo_atual):
-        """
-        Função auxiliar para encontrar o caminho menos custoso de forma recursiva.
-        """
-        # Se alcançamos o destino, não precisamos continuar
-        if no_atual == destino:
+    def _find_path_recursive(self, current_node, destination, distances, previous_path, current_cost):
+        if current_node == destination:
             return
 
-        # Explora os vizinhos do nó atual
-        for vizinho, custo in no_atual.vizinhos.items():
-            custo_total = custo_atual + custo
-            # Se o custo total para o vizinho for menor que a distância conhecida
-            if custo_total < distancias[vizinho]:
-                distancias[vizinho] = custo_total
-                caminho_anterior[vizinho] = no_atual  # Atualiza o caminho anterior para o vizinho
-                # Chama recursivamente para o vizinho
-                self._encontrar_caminho_recursivo(vizinho, destino, distancias, caminho_anterior, custo_total)
+        for neighbor, cost in current_node.neighbors.items():
+            total_cost = current_cost + cost
+            if total_cost < distances[neighbor]:
+                distances[neighbor] = total_cost
+                previous_path[neighbor] = current_node
+                self._find_path_recursive(neighbor, destination, distances, previous_path, total_cost)
 
-    def _encontrar_caminho_menos_custoso(self, origem_id, destino_id):
-        """
-        Encontra o caminho menos custoso entre duas cidades no grafo,
-        utilizando os IDs das cidades.
-        Retorna o caminho e o custo total.
-        """
-        origem = self.nos[origem_id]
-        destino = self.nos[destino_id]
+    def _find_least_costly_path(self, origin_id, destination_id):
+        origin = self.nodes[origin_id]
+        destination = self.nodes[destination_id]
         
-        # Dicionário para armazenar a menor distância conhecida até cada nó
-        distancias = {no: float('inf') for no in self.nos.values()}
-        distancias[origem] = 0  # Define a distância da origem como 0
+        distances = {node: float('inf') for node in self.nodes.values()}
+        distances[origin] = 0
 
-        # Dicionário para armazenar o caminho
-        caminho_anterior = {origem: None}
+        previous_path = {origin: None}
 
-        # Inicia a recursão a partir da origem
-        self._encontrar_caminho_recursivo(origem, destino, distancias, caminho_anterior, 0)
+        self._find_path_recursive(origin, destination, distances, previous_path, 0)
 
-        # Recupera o caminho mínimo até o destino
-        caminho = []
-        no_atual = destino
+        path = []
+        current_node = destination
 
-        while no_atual is not None:
-            caminho.insert(0, no_atual)  # Insere o nó atual no início do caminho
-            no_atual = caminho_anterior[no_atual]  # Vai para o nó anterior no caminho
+        while current_node is not None:
+            path.insert(0, current_node)
+            current_node = previous_path[current_node]
         
-        # Retorna o caminho e o custo total
-        return caminho, distancias[destino]
+        return path, distances[destination]
 
-    def mostrar_caminho_menos_custoso(self, origem_id, destino_id):
-        """
-        Mostra o caminho menos custoso entre duas cidades no grafo,
-        utilizando os IDs das cidades.
-        """
-        # Encontra o caminho menos custoso e o custo total
-        caminho, custo_total = self._encontrar_caminho_menos_custoso(origem_id, destino_id)
+    def show_least_costly_path(self, origin_id, destination_id):
+        path, total_cost = self._find_least_costly_path(origin_id, destination_id)
 
-        if custo_total != float('inf'):
-            # Se existe um caminho, exibe o caminho e o custo total
-            print(f'Caminho menos custoso de {self.nos[origem_id].conteudo} para {self.nos[destino_id].conteudo}:')
-            for i, no in enumerate(caminho):
-                if i < len(caminho) - 1:
-                    print(f'{no.conteudo} <- ', end='')
+        if total_cost != float('inf'):
+            print(f'Least costly path from {self.nodes[origin_id].content} to {self.nodes[destination_id].content}:')
+            for i, node in enumerate(path):
+                if i < len(path) - 1:
+                    print(f'{node.content} -> ', end='')
                 else:
-                    print(f'{no.conteudo}')
-            print(f'Custo total: {custo_total} km')
+                    print(f'{node.content}')
+            print(f'Total cost: {total_cost} km')
         else:
-            # Se não existe um caminho, exibe uma mensagem
-            print(f'Não há caminho de {self.nos[origem_id].conteudo} para {self.nos[destino_id].conteudo}')
+            print(f'There is no path from {self.nodes[origin_id].content} to {self.nodes[destination_id].content}')
 
-    def mostrar_caminho(self, origem_id, destino_id):
-        """
-        Mostra um caminho entre duas cidades no grafo utilizando os IDs das cidades.
-        Esta função atualmente não está sendo utilizada no menu principal.
-        """
-        origem = self.nos[origem_id]
-        destino = self.nos[destino_id]
+    def show_path(self, origin_id, destination_id):
+        origin = self.nodes[origin_id]
+        destination = self.nodes[destination_id]
         
-        caminho_atual = [origem]  # Inicializa o caminho atual com a origem
-        self._traversar(origem.vizinhos, origem, destino, origem.conteudo, caminho_atual)  # Chama a função para mostrar o caminho
+        current_path = [origin]
+        self._traverse(origin.neighbors, origin, destination, origin.content, current_path)
 
-    def _traversar(self, vizinhos, origem, destino, caminho, caminho_atual):
-        """
-        Função auxiliar para realizar a travessia recursiva para encontrar um caminho entre origem e destino.
-        Esta função atualmente não está sendo utilizada no menu principal.
-        """
-        for vizinho, _ in vizinhos.items():
-            if destino.conteudo in caminho:
+    def _traverse(self, neighbors, origin, destination, path, current_path):
+        for neighbor, _ in neighbors.items():
+            if destination.content in path:
                 break
 
-            if vizinho == destino:
-                # Se o vizinho é o destino, atualiza e imprime o caminho
-                caminho_atualizado = caminho + " <- " + destino.conteudo
-                print(caminho_atualizado)
+            if neighbor == destination:
+                updated_path = path + " -> " + destination.content
+                print(updated_path)
                 break
 
-            if vizinho not in caminho_atual:
-                # Adiciona o vizinho ao caminho atual e chama a função recursivamente
-                caminho_atual.append(vizinho)
-                self._traversar(
-                    vizinho.vizinhos, origem, destino, caminho + " <- " + vizinho.conteudo, caminho_atual
+            if neighbor not in current_path:
+                current_path.append(neighbor)
+                self._traverse(
+                    neighbor.neighbors, origin, destination, path + " -> " + neighbor.content, current_path
                 )
-                caminho_atual.remove(vizinho)  # Remove o vizinho do caminho atual ao voltar da recursão
+                current_path.remove(neighbor)
 
-    def mostrar_todas_as_rotas(self, origem_id, destino_id):
-        """
-        Mostra todas as rotas entre duas cidades no grafo utilizando os IDs das cidades.
-        """
-        if origem_id in self.nos and destino_id in self.nos:
-            origem = self.nos[origem_id]
-            destino = self.nos[destino_id]
+    def show_all_routes(self, origin_id, destination_id):
+        if origin_id in self.nodes and destination_id in self.nodes:
+            origin = self.nodes[origin_id]
+            destination = self.nodes[destination_id]
             
-            todas_as_rotas = []
-            self._buscar_todas_as_rotas(origem, destino, [], 0, todas_as_rotas)
-            if todas_as_rotas:
-                print(f'Todas as rotas de {origem.conteudo} para {destino.conteudo} e seus custos:')
-                for rota, custo in todas_as_rotas:
-                    print(f'Rota: {" <- ".join(no.conteudo for no in rota)}, Custo: {custo} km')
+            all_routes = []
+            self._search_all_routes(origin, destination, [], 0, all_routes)
+            if all_routes:
+                print(f'All routes from {origin.content} to {destination.content} and their costs:')
+                for route, cost in all_routes:
+                    print(f'Route: {" -> ".join(node.content for node in route)}, Cost: {cost} km')
             else:
-                print(f'Não há rotas de {origem.conteudo} para {destino.conteudo}')
+                print(f'There are no routes from {origin.content} to {destination.content}')
         else:
-            print("Uma das cidades não foi encontrada no grafo.")
+            print("One of the cities was not found in the graph.")
 
-    def _buscar_todas_as_rotas(self, no_atual, destino, caminho_atual, custo_atual, todas_as_rotas):
-        """
-        Função auxiliar para buscar todas as rotas entre duas cidades no grafo de forma recursiva.
-        """
-        caminho_atual.append(no_atual)
-        if no_atual == destino:
-            todas_as_rotas.append((list(caminho_atual), custo_atual))
+    def _search_all_routes(self, current_node, destination, current_path, current_cost, all_routes):
+        current_path.append(current_node)
+        if current_node == destination:
+            all_routes.append((list(current_path), current_cost))
         else:
-            for vizinho, custo in no_atual.vizinhos.items():
-                if vizinho not in caminho_atual:
-                    self._buscar_todas_as_rotas(vizinho, destino, caminho_atual, custo_atual + custo, todas_as_rotas)
-        caminho_atual.pop()
-
+            for neighbor, cost in current_node.neighbors.items():
+                if neighbor not in current_path:
+                    self._search_all_routes(neighbor, destination, current_path, current_cost + cost, all_routes)
+        current_path.pop()

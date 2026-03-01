@@ -1,86 +1,76 @@
 from colorama import init, Fore
 
-from graph import Grafo
+from graph import Graph
 
-init(autoreset=True)  # Inicializa colorama para reset automático das cores
+init(autoreset=True)
 
-def mostrar_menu(grafo):
-    """
-    Função para exibir o menu interativo e interagir com o grafo.
-    """
+def show_menu(graph):
     while True:
         print("\nMenu:")
-        print(f"{Fore.BLUE}1. Adicionar cidade")
-        print(f"{Fore.BLUE}2. Adicionar rota entre cidades")
-        print(f"{Fore.BLUE}3. Mostrar caminho menos custoso entre duas cidades")
-        print(f"{Fore.BLUE}4. Mostrar todas as rotas entre duas cidades")
-        print(f"{Fore.RED}5. Sair")
-        escolha = input(f"\n{Fore.YELLOW}Escolha uma opção: ")
+        print(f"{Fore.BLUE}1. Add city")
+        print(f"{Fore.BLUE}2. Add route between cities")
+        print(f"{Fore.BLUE}3. Show least costly path between two cities")
+        print(f"{Fore.BLUE}4. Show all routes between two cities")
+        print(f"{Fore.RED}5. Exit")
+        choice = input(f"\n{Fore.YELLOW}Choose an option: ")
 
-        if escolha == '1':
-            # Opção para adicionar uma cidade ao grafo
-            cidade = input(f"\nDigite o nome da cidade: ")
-            novo_no = grafo.adicionar_no(cidade)
-            if novo_no:
-                print(f'Cidade {cidade} adicionada.')
+        if choice == '1':
+            city = input(f"\nEnter the city name: ")
+            new_node = graph.add_node(city)
+            if new_node:
+                print(f'City {city} added.')
         
-        elif escolha == '2':
-            # Opção para adicionar uma rota entre duas cidades no grafo
-            if len(grafo.nos) < 2:
-                print("É necessário adicionar pelo menos duas cidades para adicionar uma rota.")
+        elif choice == '2':
+            if len(graph.nodes) < 2:
+                print("It is necessary to add at least two cities to add a route.")
                 continue
 
-            print(f"\n{Fore.BLUE}Cidades disponíveis:")
-            for id, no in grafo.nos.items():
-                print(f"{Fore.GREEN}{id}: {no.conteudo}")
+            print(f"\n{Fore.BLUE}Available cities:")
+            for id, node in graph.nodes.items():
+                print(f"{Fore.GREEN}{id}: {node.content}")
 
-            origem_id = int(input(f"\nDigite o número da cidade de origem: "))
-            destino_id = int(input(f"\nDigite o número da cidade de destino: "))
-            custo = float(input(f"\nDigite a distância em km: "))
-            grafo.adicionar_rota(origem_id, destino_id, custo)
-            print(f'Rota de {grafo.nos[origem_id].conteudo} para {grafo.nos[destino_id].conteudo} com distância {custo} km adicionada.')
+            origin_id = int(input(f"\nEnter the origin city number: "))
+            destination_id = int(input(f"\nEnter the destination city number: "))
+            cost = float(input(f"\nEnter the distance in km: "))
+            graph.add_route(origin_id, destination_id, cost)
+            print(f'Route from {graph.nodes[origin_id].content} to {graph.nodes[destination_id].content} with distance {cost} km added.')
 
-        elif escolha == '3':
-            # Opção para mostrar o caminho menos custoso entre duas cidades no grafo
-            if len(grafo.nos) < 2:
-                print("É necessário adicionar pelo menos duas cidades para buscar um caminho.")
+        elif choice == '3':
+            if len(graph.nodes) < 2:
+                print("It is necessary to add at least two cities to search for a path.")
                 continue
 
-            print(f"\n{Fore.BLUE}Cidades disponíveis:")
-            for id, no in grafo.nos.items():
-                print(f"{Fore.GREEN}{id}: {no.conteudo}")
+            print(f"\n{Fore.BLUE}Available cities:")
+            for id, node in graph.nodes.items():
+                print(f"{Fore.GREEN}{id}: {node.content}")
 
-            origem_id = int(input(f"\nDigite o número da cidade de origem: "))
-            destino_id = int(input(f"\nDigite o número da cidade de destino: "))
-            grafo.mostrar_caminho_menos_custoso(origem_id, destino_id)
+            origin_id = int(input(f"\nEnter the origin city number: "))
+            destination_id = int(input(f"\nEnter the destination city number: "))
+            graph.show_least_costly_path(origin_id, destination_id)
         
-        elif escolha == '4':
-            # Opção para mostrar todas as rotas entre duas cidades no grafo
-            if len(grafo.nos) < 2:
-                print("É necessário adicionar pelo menos duas cidades para buscar rotas.")
+        elif choice == '4':
+            if len(graph.nodes) < 2:
+                print("It is necessary to add at least two cities to search for routes.")
                 continue
 
-            print(f"\n{Fore.BLUE}Cidades disponíveis:")
-            for id, no in grafo.nos.items():
-                print(f"{Fore.GREEN}{id}: {no.conteudo}")
+            print(f"\n{Fore.BLUE}Available cities:")
+            for id, node in graph.nodes.items():
+                print(f"{Fore.GREEN}{id}: {node.content}")
 
-            origem_id = int(input(f"\nDigite o número da cidade de origem: "))
-            destino_id = int(input(f"\nDigite o número da cidade de destino: "))
-            grafo.mostrar_todas_as_rotas(origem_id, destino_id)
+            origin_id = int(input(f"\nEnter the origin city number: "))
+            destination_id = int(input(f"\nEnter the destination city number: "))
+            graph.show_all_routes(origin_id, destination_id)
 
-        elif escolha == '5':
-            # Opção para sair do programa
-            print(f"{Fore.RED}Saindo...")
+        elif choice == '5':
+            print(f"{Fore.RED}Exiting...")
             break
         
         else:
-            # Tratamento para escolhas inválidas
-            print(f"{Fore.RED}Opção inválida. Tente novamente.")
+            print(f"{Fore.RED}Invalid option. Try again.")
 
 def main():
-    # Função principal que inicializa o grafo e mostra o menu interativo
-    grafo = Grafo()
-    mostrar_menu(grafo)
+    graph = Graph()
+    show_menu(graph)
 
 if __name__ == "__main__":
     main()
